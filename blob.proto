@@ -1,0 +1,6 @@
+syntax = "proto3";
+package auth;
+
+message APIKeyBlob {
+    bytes secret = 1;
+}
