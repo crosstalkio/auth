@@ -27,8 +27,16 @@ func (m *Manager) VerifyToken(token []byte, payload interface{}) (*APIKey, error
 		m.Errorf("Invalid JWT: %s (%s)", err.Error(), token)
 		return nil, nil
 	}
+	if jot.IssuedAt != nil && jot.IssuedAt.Time.After(now) {
+		m.Errorf("JWT issued in the future: %v", jot.IssuedAt.Time)
+		return nil, nil
+	}
 	if jot.ExpirationTime != nil && jot.ExpirationTime.Time.Before(now) {
-		m.Warningf("JWT expired: %v", jot.ExpirationTime.Time)
+		m.Errorf("JWT expired: %v", jot.ExpirationTime.Time)
+		return nil, nil
+	}
+	if jot.NotBefore != nil && jot.NotBefore.Time.After(now) {
+		m.Errorf("JWT not yet valid: %v", jot.NotBefore.Time)
 		return nil, nil
 	}
 	var key *APIKey
@@ -45,7 +53,11 @@ func (m *Manager) VerifyToken(token []byte, payload interface{}) (*APIKey, error
 			return nil, nil
 		}
 	}
-	err = key.VerifyToken(Algorithm(hdr.Algorithm), token, payload)
+	if hdr.Algorithm != string(key.Algorithm) {
+		m.Errorf("Algorithm mismatch: expect=%s, actual=%s", key.Algorithm, hdr.Algorithm)
+		return nil, nil
+	}
+	err = key.ParseToken(token, payload)
 	if err != nil {
 		return nil, nil
 	}

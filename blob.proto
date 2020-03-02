@@ -2,5 +2,7 @@ syntax = "proto3";
 package auth;
 
 message APIKeyBlob {
-    bytes secret = 1;
+    string algorithm = 1;
+    bytes secret = 2;
+    bytes ECDSA_key = 3;
 }

@@ -7,5 +7,6 @@ require (
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.1
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/golang/protobuf v1.3.4
-	github.com/jetrtc/log v1.3.3
+	github.com/onsi/ginkgo v1.12.0 // indirect
+	github.com/onsi/gomega v1.9.0 // indirect
 )
