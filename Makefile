@@ -1,19 +1,19 @@
 PROTOS := $(wildcard *.proto)
 PBGO := $(PROTOS:.proto=.pb.go)
 
-REDISTORE := redistore
+CROSSAUTH := crossauth
+
+all: $(PBGO) $(CROSSAUTH)
+	go build .
 
 %.pb.go: %.proto
 	protoc --go_out=. $<
 
-all: $(PBGO) $(REDISTORE)
-	go build .
-
-$(REDISTORE):
-	go build -o $@ ./cmd/redistore
+$(CROSSAUTH):
+	go build -o $@ ./cmd/crossauth
 
 clean:
 	rm -f $(PBGO)
-	rm -f $(REDISTORE)
+	rm -f $(CROSSAUTH)
 
 .PHONY: all clean

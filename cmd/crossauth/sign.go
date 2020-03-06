@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/crosstalkio/auth"
 	"github.com/crosstalkio/log"
 )
 
-func sign(logger log.Sugar, store auth.APIKeyStore, id string, bytes []byte) error {
+func sign(logger log.Sugar, store auth.APIKeyStore, id string, bytes []byte, ttl int64) error {
 	key, err := store.GetAPIKey(id)
 	if err != nil {
 		return err
@@ -24,7 +25,10 @@ func sign(logger log.Sugar, store auth.APIKeyStore, id string, bytes []byte) err
 		logger.Errorf("Failed to unmarshal JSON: %s", err.Error())
 		return err
 	}
-	payload["sub"] = key.ID
+	payload["iss"] = key.ID
+	if ttl > 0 {
+		payload["exp"] = time.Now().Add(time.Second * time.Duration(ttl)).Unix()
+	}
 	token, err := key.CreateToken(&payload)
 	if err != nil {
 		return err

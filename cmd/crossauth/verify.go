@@ -17,7 +17,7 @@ func verify(logger log.Sugar, store auth.APIKeyStore, bytes []byte) error {
 		logger.Errorf("Invalid JWT: %s", err.Error())
 		return err
 	}
-	id := payload.Subject
+	id := payload.Issuer
 	if id == "" {
 		err = fmt.Errorf("Missing JWT subject")
 		logger.Errorf(err.Error())

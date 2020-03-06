@@ -23,19 +23,22 @@ func get(logger log.Sugar, store auth.APIKeyStore, id string) error {
 		logger.Errorf("%s", err.Error())
 		return err
 	}
-	logger.Infof("Key ID: %s", id)
+	return nil
+}
+
+func dumpKey(logger log.Sugar, key *auth.APIKey) {
+	logger.Infof("Key ID: %s", key.ID)
 	if key.Secret != nil {
 		if utf8.Valid(key.Secret) {
 			logger.Infof("Secret: %s", key.Secret)
 		} else {
-			logger.Infof("Secret: %s", base64.StdEncoding.EncodeToString(key.Secret))
+			logger.Infof("Secret: %s", base64.RawStdEncoding.EncodeToString(key.Secret))
 		}
 	}
 	if key.ECDSAKey != nil {
 		logger.Infof("ECDSA:")
 		dumpECDSAKey(logger, key.ECDSAKey)
 	}
-	return nil
 }
 
 func dumpECDSAKey(logger log.Sugar, key *ecdsa.PrivateKey) {

@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/crosstalkio/auth"
@@ -16,6 +17,10 @@ import (
 
 var errInvalid = fmt.Errorf("Invalid argument")
 var basename string
+
+func usage() {
+	fmt.Printf("Usage: %s add|get|del|sign|verify <args...>\n", basename)
+}
 
 func addUsage() {
 	fmt.Printf("Usage: %s add <ID> <algorithm> [secret]\n", basename)
@@ -30,7 +35,7 @@ func delUsage() {
 }
 
 func signUsage() {
-	fmt.Printf("Usage: %s sign <ID> <json string|file>\n", basename)
+	fmt.Printf("Usage: %s sign <ID> <json string|file> [ttl_sec]\n", basename)
 }
 
 func verifyUsage() {
@@ -38,13 +43,11 @@ func verifyUsage() {
 }
 
 func main() {
+	basename = filepath.Base(os.Args[0])
 	logger := log.NewSugar(log.NewLogger(log.Color(log.GoLogger(log.Debug, os.Stderr, "", log.LstdFlags))))
 	storeUrl := flag.String("store", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
-	flag.Usage = func() {
-		fmt.Printf("Usage: %s add|get|del|sign|verify <args...>\n", basename)
-	}
+	flag.Usage = usage
 	flag.Parse()
-	basename = filepath.Base(os.Args[0])
 	u, err := url.Parse(*storeUrl)
 	if err != nil {
 		logger.Errorf("Invalid store URL: %s", storeUrl)
@@ -123,7 +126,8 @@ func handle(logger log.Sugar, store auth.APIKeyStore) error {
 				return err
 			}
 		}
-		return sign(logger, store, id, bytes)
+		ttl, _ := strconv.ParseInt(flag.Arg(3), 10, 64)
+		return sign(logger, store, id, bytes, ttl)
 	case "verify":
 		token := flag.Arg(1)
 		if token == "" {

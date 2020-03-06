@@ -18,6 +18,6 @@ func add(logger log.Sugar, store auth.APIKeyStore, id, algo, secret string) erro
 	if err != nil {
 		return err
 	}
-	logger.Infof("API Key added with %s: %s", key.Algorithm, key.ID)
+	dumpKey(logger, key)
 	return nil
 }
