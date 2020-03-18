@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/crosstalkio/auth"
+	_ "github.com/crosstalkio/auth/goredis"
 	"github.com/crosstalkio/log"
-	"github.com/go-redis/redis"
 )
 
 var errInvalid = fmt.Errorf("Invalid argument")
@@ -45,7 +45,7 @@ func verifyUsage() {
 func main() {
 	basename = filepath.Base(os.Args[0])
 	logger := log.NewSugar(log.NewLogger(log.Color(log.GoLogger(log.Debug, os.Stderr, "", log.LstdFlags))))
-	storeUrl := flag.String("store", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
+	storeUrl := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
 	flag.Usage = usage
 	flag.Parse()
 	u, err := url.Parse(*storeUrl)
@@ -53,23 +53,12 @@ func main() {
 		logger.Errorf("Invalid store URL: %s", storeUrl)
 		os.Exit(1)
 	}
-	if u.Scheme != "redis" {
-		err = fmt.Errorf("Unkown store: %s", u.Scheme)
-		logger.Errorf("%s", err.Error())
-		os.Exit(1)
-	}
-	addr := fmt.Sprintf("%s:%s", u.Hostname(), u.Port())
-	pass, _ := u.User.Password()
-	client := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: pass,
-	})
-	_, err = client.Ping().Result()
+	blob, err := auth.NewBlobStore(u)
 	if err != nil {
-		logger.Errorf("Failed to ping redis: %s\n", err.Error())
+		logger.Errorf("Failed to create blob store: %v: %s", u, err.Error())
 		os.Exit(1)
 	}
-	store := auth.NewAPIKeyStore(logger, auth.NewGoRedisBlobStore(client, u.Path))
+	store := auth.NewAPIKeyStore(logger, blob)
 	err = handle(logger, store)
 	if err != nil {
 		os.Exit(1)

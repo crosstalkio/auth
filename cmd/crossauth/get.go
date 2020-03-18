@@ -23,6 +23,7 @@ func get(logger log.Sugar, store auth.APIKeyStore, id string) error {
 		logger.Errorf("%s", err.Error())
 		return err
 	}
+	dumpKey(logger, key)
 	return nil
 }
 

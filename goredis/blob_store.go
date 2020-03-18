@@ -1,21 +1,21 @@
-package auth
+package goredis
 
 import (
-	fmt "fmt"
+	"fmt"
 
 	"github.com/go-redis/redis"
 )
 
-type GoRedisBlobStore struct {
+type BlobStore struct {
 	client *redis.Client
 	prefix string
 }
 
-func NewGoRedisBlobStore(client *redis.Client, prefix string) *GoRedisBlobStore {
-	return &GoRedisBlobStore{client: client, prefix: prefix}
+func NewBlobStore(client *redis.Client, prefix string) *BlobStore {
+	return &BlobStore{client: client, prefix: prefix}
 }
 
-func (s *GoRedisBlobStore) GetBlob(id string) ([]byte, error) {
+func (s *BlobStore) GetBlob(id string) ([]byte, error) {
 	val, err := s.client.Get(s.prefix + id).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -26,11 +26,11 @@ func (s *GoRedisBlobStore) GetBlob(id string) ([]byte, error) {
 	return val, nil
 }
 
-func (s *GoRedisBlobStore) PutBlob(id string, val []byte) error {
+func (s *BlobStore) PutBlob(id string, val []byte) error {
 	return s.client.Set(s.prefix+id, val, 0).Err()
 }
 
-func (s *GoRedisBlobStore) DelBlob(id string) error {
+func (s *BlobStore) DelBlob(id string) error {
 	n, err := s.client.Del(s.prefix + id).Result()
 	if err != nil {
 		return err

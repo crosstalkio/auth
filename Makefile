@@ -2,6 +2,7 @@ PROTOS := $(wildcard *.proto)
 PBGO := $(PROTOS:.proto=.pb.go)
 
 CROSSAUTH := crossauth
+GOFILES := go.mod $(wildcard *.go) $(wildcard */*.go)
 
 all: $(PBGO) $(CROSSAUTH)
 	go build .
@@ -9,7 +10,7 @@ all: $(PBGO) $(CROSSAUTH)
 %.pb.go: %.proto
 	protoc --go_out=. $<
 
-$(CROSSAUTH):
+$(CROSSAUTH): $(GOFILES)
 	go build -o $@ ./cmd/crossauth
 
 clean:
