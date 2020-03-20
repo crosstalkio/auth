@@ -40,3 +40,16 @@ func (s *BlobStore) DelBlob(id string) error {
 	}
 	return nil
 }
+
+func (s *BlobStore) ListBlobIDs() ([]string, error) {
+	keys, err := s.client.Keys(s.prefix + "*").Result()
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, len(keys))
+	n := len(s.prefix)
+	for i, key := range keys {
+		ids[i] = key[n:]
+	}
+	return ids, nil
+}

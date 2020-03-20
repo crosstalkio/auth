@@ -25,6 +25,7 @@ type APIKeyStore interface {
 	PutAPIKey(key *APIKey) error
 	GetAPIKey(id string) (*APIKey, error)
 	DelAPIKey(id string) error
+	ListAPIKeyIDs() ([]string, error)
 }
 
 type APIKey struct {

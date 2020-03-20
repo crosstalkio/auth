@@ -45,6 +45,15 @@ func (s *apiKeyBlobStore) PutAPIKey(key *APIKey) error {
 	return nil
 }
 
+func (s *apiKeyBlobStore) ListAPIKeyIDs() ([]string, error) {
+	ids, err := s.store.ListBlobIDs()
+	if err != nil {
+		s.Errorf("Failed to list API key ID from blob store: %s", err.Error())
+		return nil, err
+	}
+	return ids, nil
+}
+
 func (s *apiKeyBlobStore) GetAPIKey(id string) (*APIKey, error) {
 	val, err := s.store.GetBlob(id)
 	if err != nil {

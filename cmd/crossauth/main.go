@@ -19,7 +19,7 @@ var errInvalid = fmt.Errorf("Invalid argument")
 var basename string
 
 func usage() {
-	fmt.Printf("Usage: %s add|get|del|sign|verify <args...>\n", basename)
+	fmt.Printf("Usage: %s list|add|get|del|sign|verify <args...>\n", basename)
 }
 
 func addUsage() {
@@ -69,6 +69,8 @@ func main() {
 func handle(logger log.Sugar, store auth.APIKeyStore) error {
 	cmd := flag.Arg(0)
 	switch cmd {
+	case "list":
+		return list(logger, store)
 	case "add":
 		id := flag.Arg(1)
 		algo := flag.Arg(2)
