@@ -45,12 +45,12 @@ func verifyUsage() {
 func main() {
 	basename = filepath.Base(os.Args[0])
 	logger := log.NewSugar(log.NewLogger(log.Color(log.GoLogger(log.Debug, os.Stderr, "", log.LstdFlags))))
-	storeUrl := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
+	storeURL := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
 	flag.Usage = usage
 	flag.Parse()
-	u, err := url.Parse(*storeUrl)
+	u, err := url.Parse(*storeURL)
 	if err != nil {
-		logger.Errorf("Invalid store URL: %s", storeUrl)
+		logger.Errorf("Invalid store URL: %s", storeURL)
 		os.Exit(1)
 	}
 	blob, err := auth.NewBlobStore(u)
@@ -63,7 +63,6 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	return
 }
 
 func handle(logger log.Sugar, store auth.APIKeyStore) error {
