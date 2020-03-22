@@ -70,7 +70,7 @@ func (s *apiKeyBlobStore) GetAPIKey(id string) (*APIKey, error) {
 		s.Errorf("Failed to unmarshal API key '%s': %s", id, err.Error())
 		return nil, err
 	}
-	key := NewAPIKey(s, id, blob.Secret)
+	key := NewAPIKey(id, blob.Secret)
 	if blob.Algorithm == "" {
 		s.Warningf("Using HS256 as default algorithm: %s", id)
 		key.Algorithm = HS256

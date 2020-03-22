@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	fmt "fmt"
 
-	"github.com/crosstalkio/log"
 	"github.com/gbrlsnchs/jwt/v3"
 )
 
@@ -29,16 +28,14 @@ type APIKeyStore interface {
 }
 
 type APIKey struct {
-	log.Sugar
 	ID        string
 	Algorithm Algorithm
 	Secret    []byte
 	ECDSAKey  *ecdsa.PrivateKey
 }
 
-func NewAPIKey(logger log.Logger, id string, secret []byte) *APIKey {
+func NewAPIKey(id string, secret []byte) *APIKey {
 	return &APIKey{
-		Sugar:     log.NewSugar(logger),
 		ID:        id,
 		Secret:    secret,
 		Algorithm: HS256,
@@ -64,13 +61,10 @@ func (k *APIKey) SetAlgorithm(algo Algorithm) error {
 	case ES512:
 		k.ECDSAKey, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
-		err = fmt.Errorf("Unknown algorithm: %s", algo)
-		k.Errorf("%s", err.Error())
-		return err
+		return fmt.Errorf("Unknown algorithm: %s", algo)
 	}
 	if err != nil {
-		k.Errorf("Failed to generete key: %s", err.Error())
-		return err
+		return fmt.Errorf("Failed to generete key: %s", err.Error())
 	}
 	k.Algorithm = algo
 	return nil
@@ -83,8 +77,7 @@ func (k *APIKey) CreateToken(payload interface{}) ([]byte, error) {
 	}
 	token, err := jwt.Sign(payload, algo)
 	if err != nil {
-		k.Errorf("Failed to sign JWT: %s", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("Failed to sign JWT: %s", err.Error())
 	}
 	return token, nil
 }
@@ -96,8 +89,7 @@ func (k *APIKey) ParseToken(token []byte, payload interface{}) error {
 	}
 	_, err = jwt.Verify(token, algo, payload)
 	if err != nil {
-		k.Errorf("Invalid signature: %s", err.Error())
-		return err
+		return fmt.Errorf("Invalid signature: %s", err.Error())
 	}
 	return nil
 }
@@ -132,6 +124,5 @@ func (k *APIKey) algorithm(algo Algorithm) (jwt.Algorithm, error) {
 	default:
 		err = fmt.Errorf("Unsupported algorithm: %s", algo)
 	}
-	k.Errorf("%s", err.Error())
-	return nil, err
+	return nil, fmt.Errorf("%s", err.Error())
 }
