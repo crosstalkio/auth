@@ -9,9 +9,9 @@ import (
 	"github.com/go-redis/redis"
 )
 
-type Factory struct{}
+type factory struct{}
 
-func (f *Factory) CreateBlobStore(u *url.URL) (auth.BlobStore, error) {
+func (f *factory) CreateBlobStore(u *url.URL) (auth.BlobStore, error) {
 	addr := fmt.Sprintf("%s:%s", u.Hostname(), u.Port())
 	pass, _ := u.User.Password()
 	client := redis.NewClient(&redis.Options{
