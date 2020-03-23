@@ -3,19 +3,21 @@ package goredis
 import (
 	"fmt"
 
+	"github.com/crosstalkio/auth"
 	"github.com/go-redis/redis"
 )
 
-type BlobStore struct {
+type blobStore struct {
 	client *redis.Client
 	prefix string
 }
 
-func NewBlobStore(client *redis.Client, prefix string) *BlobStore {
-	return &BlobStore{client: client, prefix: prefix}
+// NewBlobStore creates a redis-based blob store using go-redis client
+func NewBlobStore(client *redis.Client, prefix string) auth.BlobStore {
+	return &blobStore{client: client, prefix: prefix}
 }
 
-func (s *BlobStore) GetBlob(id string) ([]byte, error) {
+func (s *blobStore) GetBlob(id string) ([]byte, error) {
 	val, err := s.client.Get(s.prefix + id).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -26,11 +28,11 @@ func (s *BlobStore) GetBlob(id string) ([]byte, error) {
 	return val, nil
 }
 
-func (s *BlobStore) PutBlob(id string, val []byte) error {
+func (s *blobStore) PutBlob(id string, val []byte) error {
 	return s.client.Set(s.prefix+id, val, 0).Err()
 }
 
-func (s *BlobStore) DelBlob(id string) error {
+func (s *blobStore) DelBlob(id string) error {
 	n, err := s.client.Del(s.prefix + id).Result()
 	if err != nil {
 		return err
@@ -41,7 +43,7 @@ func (s *BlobStore) DelBlob(id string) error {
 	return nil
 }
 
-func (s *BlobStore) ListBlobIDs() ([]string, error) {
+func (s *blobStore) ListBlobIDs() ([]string, error) {
 	keys, err := s.client.Keys(s.prefix + "*").Result()
 	if err != nil {
 		return nil, err

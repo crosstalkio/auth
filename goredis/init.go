@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	factory := &Factory{}
+	factory := &factory{}
 	auth.RegisterBlobStore("redis", factory)
 	auth.RegisterBlobStore("goredis", factory)
 }
