@@ -5,6 +5,7 @@ CROSSAUTH := crossauth
 GOFILES := go.mod $(wildcard *.go) $(wildcard */*.go)
 
 all: $(PBGO) $(CROSSAUTH)
+	go mod tidy
 	go build .
 
 $(CROSSAUTH): $(GOFILES)
