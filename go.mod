@@ -10,5 +10,5 @@ require (
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	google.golang.org/protobuf v1.20.1-0.20200309200217-e05f789c0967
+	google.golang.org/protobuf v1.20.1
 )
