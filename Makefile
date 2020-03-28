@@ -4,13 +4,13 @@ PBGO := $(PROTOS:.proto=.pb.go)
 CROSSAUTH := crossauth
 GOFILES := go.mod $(wildcard *.go) $(wildcard */*.go)
 
-all: $(PBGO) tidy $(CROSSAUTH)
+all: $(PBGO) $(CROSSAUTH)
 	go build .
 
 tidy:
 	go mod tidy
 
-$(CROSSAUTH): tidy $(GOFILES)
+$(CROSSAUTH): $(GOFILES)
 	go build -o $@ ./cmd/crossauth
 
 clean: clean/proto
