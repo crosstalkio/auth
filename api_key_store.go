@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 
 	"github.com/crosstalkio/log"
-	proto "github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 func NewAPIKeyStore(logger log.Logger, store BlobStore) APIKeyStore {
