@@ -59,6 +59,7 @@ func (m *Manager) VerifyToken(token []byte, payload interface{}) (*APIKey, error
 	}
 	err = key.ParseToken(token, payload)
 	if err != nil {
+		m.Errorf("Failed to parse token: %s", err.Error())
 		return nil, nil
 	}
 	return key, nil
