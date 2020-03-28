@@ -27,7 +27,7 @@ func (s *apiKeyBlobStore) PutAPIKey(key *APIKey) error {
 	}
 	var err error
 	if key.ECDSAKey != nil {
-		blob.ECDSAKey, err = x509.MarshalECPrivateKey(key.ECDSAKey)
+		blob.ECDSAKey, err = s.marshalECDSAKey(key.ECDSAKey)
 		if err != nil {
 			return err
 		}
