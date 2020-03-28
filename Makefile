@@ -10,10 +10,11 @@ all: $(PBGO) tidy $(CROSSAUTH)
 tidy:
 	go mod tidy
 
-$(CROSSAUTH): $(GOFILES)
+$(CROSSAUTH): tidy $(GOFILES)
 	go build -o $@ ./cmd/crossauth
 
 clean: clean/proto
+	rm -f go.sum
 	rm -f $(CROSSAUTH)
 
 test: # -count=1 disables cache
