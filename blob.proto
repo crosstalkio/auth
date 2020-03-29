@@ -2,7 +2,7 @@ syntax = "proto3";
 package auth;
 option go_package = ".;auth";
 
-message APIKeyBlob {
+message Blob {
     string algorithm = 1;
     bytes secret = 2;
     bytes ECDSA_key = 3;

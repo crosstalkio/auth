@@ -20,29 +20,29 @@ const (
 	ES512 = "ES512"
 )
 
-type APIKeyStore interface {
-	PutAPIKey(key *APIKey) error
-	GetAPIKey(id string) (*APIKey, error)
-	DelAPIKey(id string) error
-	ListAPIKeyIDs() ([]string, error)
+type KeyStore interface {
+	PutKey(key *Key) error
+	GetKey(id string) (*Key, error)
+	DelKey(id string) error
+	ListKeyIDs() ([]string, error)
 }
 
-type APIKey struct {
+type Key struct {
 	ID        string
 	Algorithm Algorithm
 	Secret    []byte
 	ECDSAKey  *ecdsa.PrivateKey
 }
 
-func NewAPIKey(id string, secret []byte) *APIKey {
-	return &APIKey{
+func NewKey(id string, secret []byte) *Key {
+	return &Key{
 		ID:        id,
 		Secret:    secret,
 		Algorithm: HS256,
 	}
 }
 
-func (k *APIKey) SetAlgorithm(algo Algorithm) error {
+func (k *Key) SetAlgorithm(algo Algorithm) error {
 	var err error
 	switch algo {
 	case HS256:
@@ -70,7 +70,7 @@ func (k *APIKey) SetAlgorithm(algo Algorithm) error {
 	return nil
 }
 
-func (k *APIKey) CreateToken(payload interface{}) ([]byte, error) {
+func (k *Key) CreateToken(payload interface{}) ([]byte, error) {
 	algo, err := k.algorithm(k.Algorithm)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (k *APIKey) CreateToken(payload interface{}) ([]byte, error) {
 	return token, nil
 }
 
-func (k *APIKey) ParseToken(token []byte, payload interface{}) error {
+func (k *Key) ParseToken(token []byte, payload interface{}) error {
 	algo, err := k.algorithm(k.Algorithm)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (k *APIKey) ParseToken(token []byte, payload interface{}) error {
 	return nil
 }
 
-func (k *APIKey) algorithm(algo Algorithm) (jwt.Algorithm, error) {
+func (k *Key) algorithm(algo Algorithm) (jwt.Algorithm, error) {
 	var err error
 	switch algo {
 	case HS256:

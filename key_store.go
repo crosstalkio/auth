@@ -3,25 +3,34 @@ package auth
 import (
 	"crypto/ecdsa"
 	"crypto/x509"
+	"net/url"
 
 	"github.com/crosstalkio/log"
 	"google.golang.org/protobuf/proto"
 )
 
-func NewAPIKeyStore(logger log.Logger, store BlobStore) APIKeyStore {
-	return &apiKeyBlobStore{
+func NewKeyStore(logger log.Logger, url *url.URL) (KeyStore, error) {
+	store, err := NewBlobStore(url)
+	if err != nil {
+		return nil, err
+	}
+	return NewKeyStoreFromBobStore(logger, store), nil
+}
+
+func NewKeyStoreFromBobStore(logger log.Logger, store BlobStore) KeyStore {
+	return &keyBlobStore{
 		Sugar: log.NewSugar(logger),
 		store: store,
 	}
 }
 
-type apiKeyBlobStore struct {
+type keyBlobStore struct {
 	log.Sugar
 	store BlobStore
 }
 
-func (s *apiKeyBlobStore) PutAPIKey(key *APIKey) error {
-	blob := &APIKeyBlob{
+func (s *keyBlobStore) PutKey(key *Key) error {
+	blob := &Blob{
 		Algorithm: string(key.Algorithm),
 		Secret:    key.Secret,
 	}
@@ -45,7 +54,7 @@ func (s *apiKeyBlobStore) PutAPIKey(key *APIKey) error {
 	return nil
 }
 
-func (s *apiKeyBlobStore) ListAPIKeyIDs() ([]string, error) {
+func (s *keyBlobStore) ListKeyIDs() ([]string, error) {
 	ids, err := s.store.ListBlobIDs()
 	if err != nil {
 		s.Errorf("Failed to list API key ID from blob store: %s", err.Error())
@@ -54,7 +63,7 @@ func (s *apiKeyBlobStore) ListAPIKeyIDs() ([]string, error) {
 	return ids, nil
 }
 
-func (s *apiKeyBlobStore) GetAPIKey(id string) (*APIKey, error) {
+func (s *keyBlobStore) GetKey(id string) (*Key, error) {
 	val, err := s.store.GetBlob(id)
 	if err != nil {
 		s.Errorf("Failed to get API key from blob store '%s': %s", id, err.Error())
@@ -64,13 +73,13 @@ func (s *apiKeyBlobStore) GetAPIKey(id string) (*APIKey, error) {
 		s.Debugf("API key not found in blob store: %s", id)
 		return nil, nil
 	}
-	blob := &APIKeyBlob{}
+	blob := &Blob{}
 	err = proto.Unmarshal(val, blob)
 	if err != nil {
 		s.Errorf("Failed to unmarshal API key '%s': %s", id, err.Error())
 		return nil, err
 	}
-	key := NewAPIKey(id, blob.Secret)
+	key := NewKey(id, blob.Secret)
 	if blob.Algorithm == "" {
 		s.Warningf("Using HS256 as default algorithm: %s", id)
 		key.Algorithm = HS256
@@ -86,7 +95,7 @@ func (s *apiKeyBlobStore) GetAPIKey(id string) (*APIKey, error) {
 	return key, nil
 }
 
-func (s *apiKeyBlobStore) DelAPIKey(id string) error {
+func (s *keyBlobStore) DelKey(id string) error {
 	err := s.store.DelBlob(id)
 	if err != nil {
 		s.Errorf("Failed to del API key from blob store: %s", err.Error())
@@ -95,7 +104,7 @@ func (s *apiKeyBlobStore) DelAPIKey(id string) error {
 	return nil
 }
 
-func (s *apiKeyBlobStore) marshalECDSAKey(key *ecdsa.PrivateKey) ([]byte, error) {
+func (s *keyBlobStore) marshalECDSAKey(key *ecdsa.PrivateKey) ([]byte, error) {
 	bytes, err := x509.MarshalECPrivateKey(key)
 	if err != nil {
 		s.Errorf("Failed to marshal ECDSA key: %s", err.Error())
@@ -104,7 +113,7 @@ func (s *apiKeyBlobStore) marshalECDSAKey(key *ecdsa.PrivateKey) ([]byte, error)
 	return bytes, nil
 }
 
-func (s *apiKeyBlobStore) parseECDSAKey(bytes []byte) (*ecdsa.PrivateKey, error) {
+func (s *keyBlobStore) parseECDSAKey(bytes []byte) (*ecdsa.PrivateKey, error) {
 	key, err := x509.ParseECPrivateKey(bytes)
 	if err != nil {
 		s.Errorf("Failed to parse ECDSA key: %s", err.Error())

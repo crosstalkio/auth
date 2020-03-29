@@ -9,17 +9,17 @@ import (
 
 type Manager struct {
 	log.Sugar
-	store APIKeyStore
+	store KeyStore
 }
 
-func NewManager(logger log.Logger, store APIKeyStore) *Manager {
+func NewManager(logger log.Logger, store KeyStore) *Manager {
 	return &Manager{
 		Sugar: log.NewSugar(logger),
 		store: store,
 	}
 }
 
-func (m *Manager) VerifyToken(token []byte, payload interface{}) (*APIKey, error) {
+func (m *Manager) VerifyToken(token []byte, payload interface{}) (*Key, error) {
 	now := time.Now()
 	jot := &jwt.Payload{}
 	hdr, err := jwt.Verify(token, jwt.None(), jot)
@@ -39,12 +39,12 @@ func (m *Manager) VerifyToken(token []byte, payload interface{}) (*APIKey, error
 		m.Errorf("JWT not yet valid: %v", jot.NotBefore.Time)
 		return nil, nil
 	}
-	var key *APIKey
+	var key *Key
 	if jot.Issuer == "" {
 		m.Errorf("Missing JWT isser")
 		return nil, nil
 	} else {
-		key, err = m.store.GetAPIKey(jot.Issuer)
+		key, err = m.store.GetKey(jot.Issuer)
 		if err != nil {
 			return nil, err
 		}

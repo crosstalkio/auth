@@ -50,22 +50,21 @@ func main() {
 	flag.Parse()
 	u, err := url.Parse(*storeURL)
 	if err != nil {
-		logger.Errorf("Invalid store URL: %s", storeURL)
+		logger.Errorf("Invalid key store URL: %s", storeURL)
 		os.Exit(1)
 	}
-	blob, err := auth.NewBlobStore(u)
+	store, err := auth.NewKeyStore(logger, u)
 	if err != nil {
-		logger.Errorf("Failed to create blob store: %v: %s", u, err.Error())
+		logger.Errorf("Failed to create key store: %v: %s", u, err.Error())
 		os.Exit(1)
 	}
-	store := auth.NewAPIKeyStore(logger, blob)
 	err = handle(logger, store)
 	if err != nil {
 		os.Exit(1)
 	}
 }
 
-func handle(logger log.Sugar, store auth.APIKeyStore) error {
+func handle(logger log.Sugar, store auth.KeyStore) error {
 	cmd := flag.Arg(0)
 	switch cmd {
 	case "list":

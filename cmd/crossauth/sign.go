@@ -9,8 +9,8 @@ import (
 	"github.com/crosstalkio/log"
 )
 
-func sign(logger log.Sugar, store auth.APIKeyStore, id string, bytes []byte, ttl int64) error {
-	key, err := store.GetAPIKey(id)
+func sign(logger log.Sugar, store auth.KeyStore, id string, bytes []byte, ttl int64) error {
+	key, err := store.GetKey(id)
 	if err != nil {
 		return err
 	}

@@ -5,8 +5,8 @@ import (
 	"github.com/crosstalkio/log"
 )
 
-func add(logger log.Sugar, store auth.APIKeyStore, id, algo, secret string) error {
-	key := auth.NewAPIKey(id, nil)
+func add(logger log.Sugar, store auth.KeyStore, id, algo, secret string) error {
+	key := auth.NewKey(id, nil)
 	err := key.SetAlgorithm(auth.Algorithm(algo))
 	if err != nil {
 		logger.Errorf("Failed to set algorithm: %s", err.Error())
@@ -15,7 +15,7 @@ func add(logger log.Sugar, store auth.APIKeyStore, id, algo, secret string) erro
 	if secret != "" {
 		key.Secret = []byte(secret)
 	}
-	err = store.PutAPIKey(key)
+	err = store.PutKey(key)
 	if err != nil {
 		return err
 	}

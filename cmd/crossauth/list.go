@@ -5,14 +5,14 @@ import (
 	"github.com/crosstalkio/log"
 )
 
-func list(logger log.Sugar, store auth.APIKeyStore) error {
-	ids, err := store.ListAPIKeyIDs()
+func list(logger log.Sugar, store auth.KeyStore) error {
+	ids, err := store.ListKeyIDs()
 	if err != nil {
 		return err
 	}
-	keys := make([]*auth.APIKey, len(ids))
+	keys := make([]*auth.Key, len(ids))
 	for i, id := range ids {
-		keys[i], err = store.GetAPIKey(id)
+		keys[i], err = store.GetKey(id)
 		if err != nil {
 			return err
 		}

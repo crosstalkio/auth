@@ -10,7 +10,7 @@ import (
 	"github.com/gbrlsnchs/jwt/v3"
 )
 
-func verify(logger log.Sugar, store auth.APIKeyStore, bytes []byte) error {
+func verify(logger log.Sugar, store auth.KeyStore, bytes []byte) error {
 	payload := &jwt.Payload{}
 	hdr, err := jwt.Verify(bytes, jwt.None(), &payload)
 	if err != nil {
@@ -23,7 +23,7 @@ func verify(logger log.Sugar, store auth.APIKeyStore, bytes []byte) error {
 		logger.Errorf(err.Error())
 		return err
 	}
-	key, err := store.GetAPIKey(id)
+	key, err := store.GetKey(id)
 	if err != nil {
 		return err
 	}

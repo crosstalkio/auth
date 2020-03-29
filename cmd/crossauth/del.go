@@ -5,8 +5,8 @@ import (
 	"github.com/crosstalkio/log"
 )
 
-func del(logger log.Sugar, store auth.APIKeyStore, id string) error {
-	err := store.DelAPIKey(id)
+func del(logger log.Sugar, store auth.KeyStore, id string) error {
+	err := store.DelKey(id)
 	if err != nil {
 		return err
 	}

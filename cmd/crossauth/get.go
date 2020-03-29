@@ -13,8 +13,8 @@ import (
 	"github.com/crosstalkio/log"
 )
 
-func get(logger log.Sugar, store auth.APIKeyStore, id string) error {
-	key, err := store.GetAPIKey(id)
+func get(logger log.Sugar, store auth.KeyStore, id string) error {
+	key, err := store.GetKey(id)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func get(logger log.Sugar, store auth.APIKeyStore, id string) error {
 	return nil
 }
 
-func dumpKey(logger log.Sugar, key *auth.APIKey) {
+func dumpKey(logger log.Sugar, key *auth.Key) {
 	logger.Infof("Key ID: %s", key.ID)
 	if key.Secret != nil {
 		if utf8.Valid(key.Secret) {
