@@ -1,4 +1,4 @@
-package main
+package google
 
 import (
 	"crypto/rsa"
@@ -98,7 +98,7 @@ func (s *settings) signJWT(serviceURL string) ([]byte, error) {
 	now := time.Now()
 	jot := &struct {
 		*jwt.Payload
-		TargetAudience string
+		TargetAudience string `json:"target_audience"`
 	}{
 		Payload: &jwt.Payload{
 			Issuer:         cfg.Email,
