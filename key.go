@@ -21,6 +21,7 @@ const (
 )
 
 type KeyStore interface {
+	Close() error
 	PutKey(key *Key) error
 	GetKey(id string) (*Key, error)
 	DelKey(id string) error

@@ -29,6 +29,10 @@ type keyBlobStore struct {
 	store BlobStore
 }
 
+func (s *keyBlobStore) Close() error {
+	return s.store.Close()
+}
+
 func (s *keyBlobStore) PutKey(key *Key) error {
 	blob := &Blob{
 		Algorithm: string(key.Algorithm),

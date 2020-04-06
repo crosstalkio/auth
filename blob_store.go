@@ -6,6 +6,7 @@ import (
 )
 
 type BlobStore interface {
+	Close() error
 	GetBlob(id string) ([]byte, error)
 	PutBlob(id string, val []byte) error
 	DelBlob(id string) error

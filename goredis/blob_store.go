@@ -17,6 +17,10 @@ func NewBlobStore(client *redis.Client, prefix string) auth.BlobStore {
 	return &blobStore{client: client, prefix: prefix}
 }
 
+func (s *blobStore) Close() error {
+	return s.client.Close()
+}
+
 func (s *blobStore) GetBlob(id string) ([]byte, error) {
 	val, err := s.client.Get(s.prefix + id).Bytes()
 	if err != nil {
