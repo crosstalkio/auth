@@ -20,14 +20,6 @@ const (
 	ES512 = "ES512"
 )
 
-type KeyStore interface {
-	Close() error
-	PutKey(key *Key) error
-	GetKey(id string) (*Key, error)
-	DelKey(id string) error
-	ListKeyIDs() ([]string, error)
-}
-
 type Key struct {
 	ID        string
 	Algorithm Algorithm

@@ -2,7 +2,7 @@ PROTOS := $(wildcard *.proto)
 PBGO := $(PROTOS:.proto=.pb.go)
 
 CROSSAUTH := crossauth
-GOFILES := go.mod $(wildcard *.go) $(wildcard */*.go)
+GOFILES := go.mod $(wildcard *.go) $(wildcard */*.go) $(wildcard */*/*.go)
 
 all: $(PBGO) $(CROSSAUTH)
 	go build .

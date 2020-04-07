@@ -4,8 +4,14 @@ import (
 	"github.com/crosstalkio/auth"
 )
 
+var schemes = []string{
+	"redis",
+	"goredis",
+}
+
 func init() {
 	factory := &factory{}
-	auth.RegisterBlobStore("redis", factory)
-	auth.RegisterBlobStore("goredis", factory)
+	for _, scheme := range schemes {
+		auth.RegisterBlobStore(scheme, factory)
+	}
 }

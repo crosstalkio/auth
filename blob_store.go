@@ -2,11 +2,14 @@ package auth
 
 import (
 	"fmt"
+	"io"
 	"net/url"
+
+	"github.com/crosstalkio/log"
 )
 
 type BlobStore interface {
-	Close() error
+	io.Closer
 	GetBlob(id string) ([]byte, error)
 	PutBlob(id string, val []byte) error
 	DelBlob(id string) error
@@ -14,7 +17,7 @@ type BlobStore interface {
 }
 
 type BlobStoreFactory interface {
-	CreateBlobStore(url *url.URL) (BlobStore, error)
+	CreateBlobStore(logger log.Logger, url *url.URL) (BlobStore, error)
 }
 
 var blobStoreFactories = map[string]BlobStoreFactory{}
@@ -23,10 +26,18 @@ func RegisterBlobStore(proto string, factory BlobStoreFactory) {
 	blobStoreFactories[proto] = factory
 }
 
-func NewBlobStore(url *url.URL) (BlobStore, error) {
+func NewBlobStore(logger log.Logger, url_ string) (BlobStore, error) {
+	s := log.NewSugar(logger)
+	url, err := url.Parse(url_)
+	if err != nil {
+		s.Errorf("Invalid URL: %s (%s)", url_, err.Error())
+		return nil, err
+	}
 	factory := blobStoreFactories[url.Scheme]
 	if factory == nil {
-		return nil, fmt.Errorf("Scheme not supported: %s", url.Scheme)
+		err = fmt.Errorf("Factory not registered: %s", url.Scheme)
+		s.Errorf(err.Error())
+		return nil, err
 	}
-	return factory.CreateBlobStore(url)
+	return factory.CreateBlobStore(logger, url)
 }

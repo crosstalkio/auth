@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -45,19 +44,15 @@ func verifyUsage() {
 func main() {
 	basename = filepath.Base(os.Args[0])
 	logger := log.NewSugar(log.NewLogger(log.Color(log.GoLogger(log.Debug, os.Stderr, "", log.LstdFlags))))
-	storeURL := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
+	url := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
 	flag.Usage = usage
 	flag.Parse()
-	u, err := url.Parse(*storeURL)
+	store, err := auth.NewKeyStore(logger, *url)
 	if err != nil {
-		logger.Errorf("Invalid key store URL: %s", storeURL)
+		logger.Errorf("Failed to create key store: %v: %s", *url, err.Error())
 		os.Exit(1)
 	}
-	store, err := auth.NewKeyStore(logger, u)
-	if err != nil {
-		logger.Errorf("Failed to create key store: %v: %s", u, err.Error())
-		os.Exit(1)
-	}
+	logger.Infof("Key store: %s", *url)
 	err = handle(logger, store)
 	if err != nil {
 		os.Exit(1)

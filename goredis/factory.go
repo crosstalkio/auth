@@ -1,26 +1,37 @@
 package goredis
 
 import (
-	fmt "fmt"
+	"fmt"
 	"net/url"
 	"strings"
 
 	"github.com/crosstalkio/auth"
+	"github.com/crosstalkio/log"
 	"github.com/go-redis/redis"
 )
 
 type factory struct{}
 
-func (f *factory) CreateBlobStore(u *url.URL) (auth.BlobStore, error) {
-	addr := fmt.Sprintf("%s:%s", u.Hostname(), u.Port())
-	pass, _ := u.User.Password()
-	client := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: pass,
-	})
-	_, err := client.Ping().Result()
-	if err != nil {
+func (f *factory) CreateBlobStore(logger log.Logger, u *url.URL) (auth.BlobStore, error) {
+	hit := false
+	for _, scheme := range schemes {
+		if u.Scheme == scheme {
+			hit = true
+			break
+		}
+	}
+	if !hit {
+		err := fmt.Errorf("Not supported scheme: %s", u.Scheme)
+		log.NewSugar(logger).Errorf(err.Error())
 		return nil, err
 	}
-	return NewBlobStore(client, strings.TrimPrefix(u.Path, "/")), nil
+	pass, _ := u.User.Password()
+	opts := &Options{
+		Options: redis.Options{
+			Addr:     u.Host,
+			Password: pass,
+		},
+		Prefix: strings.TrimPrefix(u.Path, "/"),
+	}
+	return NewBlobStore(logger, opts)
 }
