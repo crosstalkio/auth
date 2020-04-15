@@ -115,13 +115,13 @@ func (s *blobKeyStore) getKey(id string) (*Key, bool, error) {
 	return key, pb, nil
 }
 
-func (s *blobKeyStore) DelKey(id string) error {
-	err := s.store.DelBlob(id)
+func (s *blobKeyStore) DelKey(id string) (bool, error) {
+	deleted, err := s.store.DelBlob(id)
 	if err != nil {
 		s.Errorf("Failed to del API key from blob store: %s", err.Error())
-		return err
+		return deleted, err
 	}
-	return nil
+	return deleted, nil
 }
 
 func (s *blobKeyStore) marshalECDSAKey(key *ecdsa.PrivateKey) ([]byte, error) {

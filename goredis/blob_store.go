@@ -1,8 +1,6 @@
 package goredis
 
 import (
-	"fmt"
-
 	"github.com/crosstalkio/auth"
 	"github.com/crosstalkio/log"
 	"github.com/go-redis/redis"
@@ -57,17 +55,14 @@ func (s *blobStore) PutBlob(id string, val []byte) error {
 	return s.client.Set(s.prefix+id, val, 0).Err()
 }
 
-func (s *blobStore) DelBlob(id string) error {
+func (s *blobStore) DelBlob(id string) (bool, error) {
 	s.Debugf("Deleting blob from redis: %s", id)
 	n, err := s.client.Del(s.prefix + id).Result()
 	if err != nil {
-		return err
+		s.Errorf("Failed to delete redis: %s", err.Error())
+		return false, err
 	}
-	if n <= 0 {
-		s.Warningf("Blob not found in redis: %s", id)
-		return fmt.Errorf("Not found: %s", id)
-	}
-	return nil
+	return n > 0, nil
 }
 
 func (s *blobStore) ListBlobIDs() ([]string, error) {

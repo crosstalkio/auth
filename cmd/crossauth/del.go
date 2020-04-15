@@ -6,10 +6,14 @@ import (
 )
 
 func del(logger log.Sugar, store auth.KeyStore, id string) error {
-	err := store.DelKey(id)
+	deleted, err := store.DelKey(id)
 	if err != nil {
 		return err
 	}
-	logger.Infof("API Key deleted: %s", id)
+	if deleted {
+		logger.Infof("API Key deleted: %s", id)
+	} else {
+		logger.Infof("API Key not exist: %s", id)
+	}
 	return nil
 }

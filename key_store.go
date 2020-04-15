@@ -10,7 +10,7 @@ type KeyStore interface {
 	io.Closer
 	PutKey(key *Key) error
 	GetKey(id string) (*Key, error)
-	DelKey(id string) error
+	DelKey(id string) (bool, error)
 	ListKeyIDs() ([]string, error)
 }
 

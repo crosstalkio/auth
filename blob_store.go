@@ -12,7 +12,7 @@ type BlobStore interface {
 	io.Closer
 	GetBlob(id string) ([]byte, error)
 	PutBlob(id string, val []byte) error
-	DelBlob(id string) error
+	DelBlob(id string) (bool, error)
 	ListBlobIDs() ([]string, error)
 }
 
