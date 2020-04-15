@@ -63,24 +63,24 @@ func (k *Key) SetAlgorithm(algo Algorithm) error {
 	return nil
 }
 
-func (k *Key) CreateToken(payload interface{}) ([]byte, error) {
+func (k *Key) CreateToken(claims interface{}) ([]byte, error) {
 	algo, err := k.algorithm(k.Algorithm)
 	if err != nil {
 		return nil, err
 	}
-	token, err := jwt.Sign(payload, algo)
+	token, err := jwt.Sign(claims, algo)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to sign JWT: %s", err.Error())
 	}
 	return token, nil
 }
 
-func (k *Key) ParseToken(token []byte, payload interface{}) error {
+func (k *Key) ParseToken(token []byte, claims interface{}) error {
 	algo, err := k.algorithm(k.Algorithm)
 	if err != nil {
 		return err
 	}
-	_, err = jwt.Verify(token, algo, payload)
+	_, err = jwt.Verify(token, algo, claims)
 	if err != nil {
 		return fmt.Errorf("Invalid signature: %s", err.Error())
 	}
