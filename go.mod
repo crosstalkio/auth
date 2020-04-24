@@ -1,6 +1,6 @@
 module github.com/crosstalkio/auth
 
-go 1.13
+go 1.14
 
 require (
 	github.com/crosstalkio/log v0.0.0-20200328074844-c51cbd4f4383
