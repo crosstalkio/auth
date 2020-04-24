@@ -44,7 +44,7 @@ func verifyUsage() {
 func main() {
 	basename = filepath.Base(os.Args[0])
 	logger := log.NewSugar(log.NewLogger(log.Color(log.GoLogger(log.Debug, os.Stderr, "", log.LstdFlags))))
-	url := flag.String("url", "redis://127.0.0.1:6379/crosstalk/apikey/", "")
+	url := flag.String("url", "redis://127.0.0.1:6379/apikey/", "")
 	flag.Usage = usage
 	flag.Parse()
 	store, err := auth.NewKeyStore(logger, *url)

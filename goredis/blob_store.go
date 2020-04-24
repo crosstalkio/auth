@@ -3,7 +3,7 @@ package goredis
 import (
 	"github.com/crosstalkio/auth"
 	"github.com/crosstalkio/log"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 )
 
 type Options struct {
